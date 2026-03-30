@@ -85,20 +85,109 @@
  */
 export function validateName(name) {
   // Your code here
+  if (typeof name !== "string")
+    return { valid: false, error: "Naam string hona chahiye" };
+  const arr = Array.from(name);
+  if (name.length < 2)
+    return {
+      valid: false,
+      error: "Naam mein kam se kam 2 characters hone chahiye",
+    };
+  if (name.length > 50)
+    return { valid: false, error: "Naam 50 characters se zyada nahi ho sakta" };
+  if (!name.match(/^[A-Za-z ]+$/))
+    return {
+      valid: false,
+      error: "Naam mein sirf letters aur spaces allowed hain",
+    };
+  return {
+    valid: true,
+    error: null,
+  };
 }
 
 export function validateDate(dateString) {
   // Your code here
+  let error = null;
+  const date = new Date(dateString);
+  if (typeof dateString !== "string") error = "Date string honi chahiye";
+  else if (date - Date.now() < 0) error = "Date aaj ya future ki honi chahiye";
+  else if (
+    !Number(date.getFullYear()) ||
+    !Number(date.getMonth()) ||
+    !Number(date.getDate())
+  )
+    error = "Date YYYY-MM-DD format mein honi chahiye";
+  if (error) return { valid: false, error };
+  else return { valid: true, error };
 }
 
 export function validateAartiType(type) {
   // Your code here
+  let error = null;
+  if (typeof type !== "string") error = "Aarti type string hona chahiye";
+  else if (type !== "morning" && type !== "evening" && type !== "special") {
+    error = "Aarti type morning, evening, ya special mein se hona chahiye";
+  }
+  if (error) return { valid: false, error };
+  return { valid: true, error: null };
 }
 
 export function setupAartiForm(formElement, onSuccess, onError) {
   // Your code here
+  if (!formElement) return null;
+  if (typeof onSuccess !== "function" || typeof onError !== "function") {
+    return null;
+  }
+  formElement.addEventListener("submit", submitHandler);
+  function submitHandler(e) {
+    e.preventDefault();
+    const name = formElement.querySelector(`[name = 'name']`);
+    const date = formElement.querySelector(`[name = 'date']`);
+    const type = formElement.querySelector(`[name = 'aartiType']`);
+
+    const errorsArray = [];
+    const nameValidation = validateName(name.value);
+    const dateValidation = validateDate(date.value);
+    const typeValidation = validateAartiType(type.textContent.toLowerCase());
+    // console.log(nameValidation, dateValidation, typeValidation);
+    // console.log(name.value, date.value, type.textContent.toLowerCase());
+    if (!nameValidation.valid || !dateValidation.valid || !typeValidation.valid) {
+      nameValidation.valid ? "" : errorsArray.push(nameValidation.error);
+      dateValidation.valid ? "" : errorsArray.push(dateValidation.error);
+      typeValidation.valid ? "" : errorsArray.push(typeValidation.error);
+      onError(errorsArray);
+    } else{
+      onSuccess({
+        name: name.value,
+        date: date.value,
+        aartiType: type.textContent.toLowerCase(),
+      });
+  }}
+  return () => formElement.removeEventListener("submit", submitHandler);
 }
 
 export function createBookingSummary(booking) {
   // Your code here
+  if(!booking) return null;
+  const {name, date, aartiType} = booking;
+  if(!name || !date || !aartiType) return null;
+  const div = document.createElement('div')
+  div.classList.add('booking-summary');
+  const h3 = document.createElement('h3')
+  const pName = document.createElement('p')
+  const pDate = document.createElement('p')
+  const pType = document.createElement('p')
+  h3.textContent = 'Booking Confirmation'
+  pName.className = 'booking-name'
+  pDate.className = 'booking-date'
+  pType.className = 'booking-type'
+  pName.textContent = `Bhakt: ${name}`
+  pDate.textContent = `Date: ${date}`
+  pType.textContent = `Aarti: ${aartiType}`
+  div.appendChild(h3)
+  div.appendChild(pName)
+  div.appendChild(pDate)
+  div.appendChild(pType)
+  return div
 }

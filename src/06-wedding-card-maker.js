@@ -68,12 +68,126 @@
  */
 export function setupGuestList(containerElement) {
   // Your code here
+  if (!containerElement) return null;
+  containerElement.addEventListener("click", (e) => {
+    if (e.target.className === "remove-btn") {
+      containerElement.removeChild(e.target.closest(".guest-item"));
+    }
+  });
+  return {
+    addGuest(name, side) {
+      const div = document.createElement("div");
+      div.classList.add("guest-item");
+      div.setAttribute("data-name", name);
+      div.setAttribute("data-side", side);
+      div.innerHTML = `<span>${name}</span>`;
+      const button = document.createElement("button");
+      button.classList.add("remove-btn");
+      button.textContent = "Remove";
+      div.appendChild(button);
+      containerElement.appendChild(div);
+      return div;
+    },
+    removeGuest(name) {
+      for (let item of containerElement.children) {
+        if (item.getAttribute("data-name") === name) {
+          containerElement.removeChild(item);
+          return true;
+        }
+      }
+      return false;
+    },
+    getGuests() {
+      const guestList = [];
+      for (let item of containerElement.children) {
+        guestList.push({
+          name: item.getAttribute("data-name"),
+          side: item.getAttribute("data-side"),
+        });
+      }
+      return guestList;
+    },
+  };
 }
 
 export function setupThemeSelector(containerElement, previewElement) {
   // Your code here
+  if (!containerElement || !previewElement) return null;
+  const traditionalButton = document.createElement("button");
+  traditionalButton.classList.add("theme-btn");
+  traditionalButton.setAttribute("data-theme", "traditional");
+  traditionalButton.textContent = "traditional";
+  const modernButton = document.createElement("button");
+  modernButton.classList.add("theme-btn");
+  modernButton.setAttribute("data-theme", "modern");
+  modernButton.textContent = "modern";
+  const royalButton = document.createElement("button");
+  royalButton.classList.add("theme-btn");
+  royalButton.setAttribute("data-theme", "royal");
+  royalButton.textContent = "royal";
+  containerElement.appendChild(traditionalButton);
+  containerElement.appendChild(modernButton);
+  containerElement.appendChild(royalButton);
+  containerElement.addEventListener("click", (e) => {
+    if (e.target.className === "theme-btn") {
+      previewElement.className = e.target.getAttribute("data-theme");
+      previewElement.setAttribute(
+        "data-theme",
+        e.target.getAttribute("data-theme"),
+      );
+    }
+  });
+  return {
+    getTheme() {
+      return previewElement.getAttribute("data-theme") || null;
+    },
+  };
 }
 
 export function setupCardEditor(cardElement) {
   // Your code here
+  if (!cardElement) return null;
+  cardElement.addEventListener("click", (e) => {
+    if (e.target.hasAttribute("data-editable")) {
+      // for (let ele of cardElement.children) {
+      //   console.log(ele.classList)
+      //   if (ele.classList.contains("editing")) {
+      //     ele.classList.remove("editing");
+      //     ele.contentEditable = "false";
+      //   } else {
+      //     ele.classList.add("editing");
+      //     ele.contentEditable = "true";
+      //   }
+      // }
+        if (e.target.classList.contains("editing")) {
+          e.target.classList.remove("editing");
+          e.target.contentEditable = "false";
+        } else {
+          e.target.classList.add("editing");
+          e.target.contentEditable = "true";
+          for(let ele of cardElement.children){
+            if(ele !== e.target) {
+              ele.classList.remove("editing");
+              ele.contentEditable = "false";
+            }
+          }
+        }
+    } else {
+      for (let ele of cardElement.children) {
+        if (ele.classList.contains("editing")) {
+          ele.classList.remove("editing");
+          ele.contentEditable = "false";
+        }
+      }
+    }
+  });
+  return {
+    getContent(field) {
+      for (let element of cardElement.children) {
+        if (element.getAttribute("data-editable") === field)
+          return element.textContent;
+      }
+      return null;
+    },
+  };
 }

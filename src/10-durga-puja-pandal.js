@@ -91,24 +91,73 @@
  */
 export function createPandalElement(pandal) {
   // Your code here
+  if (!pandal) return null;
+  const { name, zone, theme, budget, rating } = pandal;
+  if (!name || !zone || !theme || !budget || !rating || typeof budget !== 'number'|| typeof rating !== 'number') return null;
+  const div = document.createElement("div");
+  div.className = "pandal";
+  div.dataset.name = name;
+  div.dataset.zone = zone;
+  div.dataset.theme = theme;
+  div.dataset.budget = budget;
+  div.dataset.rating = rating;
+  div.textContent = name;
+  return div;
 }
 
 export function getPandalInfo(element) {
   // Your code here
+  if (!element) return null;
+  return {
+    name: element.dataset.name,
+    zone: element.dataset.zone,
+    theme: element.dataset.theme,
+    budget: Number(element.dataset.budget),
+    rating: Number(element.dataset.rating),
+  };
 }
 
 export function updatePandalRating(element, newRating) {
   // Your code here
+  if (!element || Number(newRating) < 0 || Number(newRating) > 5) return null;
+  const res = Number(element.dataset.rating);
+  element.dataset.rating = newRating;
+  return res;
 }
 
 export function filterPandalsByZone(container, zone) {
   // Your code here
+  if (typeof zone !== "string" || !container) return [];
+  const res = [];
+  for (let i = 0; i < container.children.length; i++) {
+    if(container.children[i].dataset.zone === zone)
+		res.push(container.children[i])
+  }
+  return res;
 }
 
 export function getPandalsByBudgetRange(container, min, max) {
-  // Your code here
+	// Your code here
+	if(!container || typeof min !== 'number' || typeof max !== 'number') return [];
+	const res = [];
+	for (let i = 0; i < container.children.length; i++) {
+	  if(Number(container.children[i].dataset.budget) >= min && Number(container.children[i].dataset.budget) <= max)
+	  res.push(container.children[i]);
+	}
+	return res;
+	
 }
 
 export function sortPandalsByRating(container) {
-  // Your code here
+	// Your code here
+	if(!container) return [];
+	const res = [];
+	for (let i = 0; i < container.children.length; i++) {
+	  res.push(container.children[i]);
+	}
+	res.sort((a, b) => Number(b.dataset.rating)-Number(a.dataset.rating))
+	container.innerHTML = ''
+	res.forEach((item) => container.appendChild(item));
+	return res;
+
 }

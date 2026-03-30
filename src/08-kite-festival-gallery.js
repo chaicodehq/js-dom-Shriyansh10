@@ -80,20 +80,81 @@
  */
 export function renderKiteCard(kite) {
   // Your code here
+  if (!kite) return null;
+  const { name, color, size, maker, image } = kite;
+  if (!name || !color || !size || !maker || !image) return null;
+  const div = document.createElement("div");
+  div.className = "kite-card";
+  const img = document.createElement("img");
+  img.setAttribute("src", image);
+  img.setAttribute("alt", name);
+  const h3 = document.createElement("h3");
+  h3.className = "kite-name";
+  h3.textContent = name;
+  const pMaker = document.createElement("p");
+  pMaker.className = "kite-maker";
+  pMaker.textContent = `by ${maker}`;
+  const pInfo = document.createElement("p");
+  pInfo.className = "kite-info";
+  pInfo.textContent = `${size} - ${color}`;
+  div.appendChild(img);
+  div.appendChild(h3);
+  div.appendChild(pMaker);
+  div.appendChild(pInfo);
+  return div;
 }
 
 export function renderGallery(container, kites) {
   // Your code here
+  if (!container || !Array.isArray(kites)) return -1;
+  container.innerHTML = "";
+  kites.forEach((kite) => {
+    if (renderKiteCard(kite) instanceof Node)
+      container.appendChild(renderKiteCard(kite));
+  });
+  return container.children.length;
 }
 
 export function filterKites(container, kites, filterFn) {
   // Your code here
+  if (!container) return -1;
+  if (!Array.isArray(kites) || typeof filterFn !== "function") return -1;
+  container.innerHTML = "";
+  kites
+    .filter((kite) => filterFn(kite))
+    .forEach((kite) => {
+      console.log(renderKiteCard(kite) instanceof Node);
+      if (renderKiteCard(kite) instanceof Node)
+        container.appendChild(renderKiteCard(kite));
+    });
+  return container.children.length;
 }
 
 export function sortAndRender(container, kites, sortField, order) {
   // Your code here
+  if (!container || !Array.isArray(kites)) return [];
+  const newKites = structuredClone(kites);
+  container.innerHTML = "";
+  if (!order || order === "asc")
+    newKites
+      .sort((a, b) => a[sortField].localeCompare(b[sortField]))
+      .forEach((kite) => container.appendChild(renderKiteCard(kite)));
+  else
+    newKites
+      .sort((a, b) => b[sortField].localeCompare(a[sortField]))
+      .forEach((kite) => container.appendChild(renderKiteCard(kite)));
+  return newKites;
 }
 
 export function renderEmptyState(container, message) {
   // Your code here
+  if (!container) return false;
+  if (container.children.length === 0) {
+    const p = document.createElement("p");
+    p.className = "empty-state";
+    p.textContent = message;
+    container.appendChild(p);
+    return true;
+  }
+  return false;
 }
