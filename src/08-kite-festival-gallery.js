@@ -133,7 +133,7 @@ export function filterKites(container, kites, filterFn) {
 export function sortAndRender(container, kites, sortField, order) {
   // Your code here
   if (!container || !Array.isArray(kites)) return [];
-  const newKites = structuredClone(kites);
+  const newKites = [...kites];
   container.innerHTML = "";
   if (!order || order === "asc")
     newKites
